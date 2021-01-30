@@ -15,25 +15,21 @@ exports.validateReqBody = (req, res, next) => {
   }
 };
 
-exports.validate = (Schema) => {
-  function validateErrorMessage(errorData) {
-    let errMessage = errorData[0].replace(/"/g, '');
-    errMessage = errMessage.replace(/must be of type/g, 'should be an');
-    return `${errMessage}.`;
-  }
+function formatErrorMessage(errorData) {
+  let errMessage = errorData[0].replace(/"/g, '');
+  errMessage = errMessage.replace(/must be of type/g, 'should be an');
+  return `${errMessage}.`;
+}
 
-  // eslint-disable-next-line consistent-return
-  return (req, _res, next) => {
-    // validation
-    try {
-      const { error } = Schema.validate(req.body);
-      if (!error) return next();
-      const err = new Error('Validation Error.');
-      err.data = validateErrorMessage(error.details.map((errorObject) => errorObject.message));
-      err.statusCode = 400;
-      next(err);
-    } catch (error) {
-      next(error);
-    }
-  };
-};
+exports.validate = (Schema) => ((req, _res, next) => {
+  try {
+    const { error } = Schema.validate(req.body);
+    if (!error) return next();
+    const err = new Error('Validation Error.');
+    err.data = formatErrorMessage(error.details.map((errorObject) => errorObject.message));
+    err.statusCode = 400;
+    return next(err);
+  } catch (error) {
+    return next(error);
+  }
+});
