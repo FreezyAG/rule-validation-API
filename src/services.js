@@ -54,12 +54,16 @@ exports.retrieveApplicantData = () => ({
    * @returns String
    */
 exports.validatePayload = async (data) => {
-  const ruleFieldValue = data.rule.field.split('.').reduce((obj, i) => obj[i], data.data);
+  try {
+    const ruleFieldValue = data.rule.field.split('.').reduce((obj, i) => obj[i], data.data);
 
-  if (!ruleFieldValue) {
-    return throwError('Missing field.', `field ${data.rule.field} is missing from data.`, 400);
+    if (!ruleFieldValue) {
+      return throwError('Missing field.', `field ${data.rule.field} is missing from data.`, 400);
+    }
+    return evaluateCondition({ ...data.rule, ...{ field: ruleFieldValue } });
+  } catch (error) {
+    throwError('Missing field.', `field ${data.rule.field} is missing from data.`, 400);
   }
-  return evaluateCondition({ ...data.rule, ...{ field: ruleFieldValue } });
 };
 
 exports.throwError = throwError;

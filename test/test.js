@@ -105,16 +105,26 @@ describe('testing-POST-route', () => {
   when the field specified in the rule object is missing from the data passed`, async (done) => {
     const requestBody = {
       rule: {
-        field: '5',
-        condition: 'contains',
-        condition_value: 'rocinante',
+        field: 'missions.count',
+        condition: 'gte',
+        condition_value: 30,
       },
-      data: ['The Nauvoo', 'The Razorback', 'The Roci', 'Tycho'],
+      data: {
+        name: 'James Holden',
+        crew: 'Rocinante',
+        age: 34,
+        position: 'Captain',
+        notMission: {
+          notCount: 45,
+          successful: 44,
+          failed: 1,
+        },
+      },
     };
 
     const { body } = await request(app).post('/validate-rule').send(requestBody);
     expect(body).toEqual({
-      message: 'field 5 is missing from data.',
+      message: 'field missions.count is missing from data.',
       status: 'error',
       data: null,
     });
