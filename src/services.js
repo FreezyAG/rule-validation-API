@@ -15,7 +15,22 @@ function throwError(errorName, errorData, status) {
   error.status = status;
   throw error;
 }
-exports.throwError = throwError;
+
+function sendResponse(body, status, isError, validationResponse) {
+  return {
+    message: `field ${body.rule.field} ${validationResponse}.`,
+    status,
+    data: {
+      validation: {
+        error: isError,
+        field: body.rule.field,
+        field_value: body.rule.field.split('.').reduce((obj, i) => obj[i], body.data),
+        condition: body.rule.condition,
+        condition_value: body.rule.condition_value,
+      },
+    },
+  };
+}
 
 /**
  * Retrieves object containing applicant's data
@@ -46,3 +61,6 @@ exports.validatePayload = async (data) => {
   }
   return evaluateCondition({ ...data.rule, ...{ field: ruleFieldValue } });
 };
+
+exports.throwError = throwError;
+exports.sendResponse = sendResponse;

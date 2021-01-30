@@ -1,21 +1,5 @@
 /* eslint-disable consistent-return */
-const { retrieveApplicantData, validatePayload } = require('./services');
-
-function sendResponse(body, status, isError, validationResponse) {
-  return {
-    message: `field ${body.rule.field} ${validationResponse}.`,
-    status,
-    data: {
-      validation: {
-        error: isError,
-        field: body.rule.field,
-        field_value: body.rule.field.split('.').reduce((obj, i) => obj[i], body.data),
-        condition: body.rule.condition,
-        condition_value: body.rule.condition_value,
-      },
-    },
-  };
-}
+const { retrieveApplicantData, validatePayload, sendResponse } = require('./services');
 
 exports.getApplicantData = async (req, res, next) => {
   try {
